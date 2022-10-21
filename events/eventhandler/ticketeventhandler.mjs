@@ -1,6 +1,8 @@
 import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, getUserByTicketId, openAllTicket, openTicket } from '../../service/ticketInfo.service.mjs';
 import { validationResult } from 'express-validator';
 import { ticketEventEmitter } from "../event/ticket.event.mjs";
+import { TicketNotFoundException } from '../../error/ticket.error.mjs';
+
 
 async function openTicketEventHandler(req, res) {
     try {

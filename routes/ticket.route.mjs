@@ -1,72 +1,18 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
-import { body, validationResult } from 'express-validator';
-import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, getUserByTicketId, openAllTicket, openTicket } from "../service/ticketInfo.service.mjs";
-import { queryBusById } from "../model/ticketInfo.model.mjs";
-import { UserNotFoundException } from "../error/user.error.mjs";
-import { TicketNotFoundException } from "../error/ticket.error.mjs";
+import { body } from 'express-validator';
+import { ticketEventEmitter } from "../events/event/ticket.event.mjs";
+import '../events/eventhandler/ticketeventhandler.mjs';
 
 const ticketRouter = Router();
 ticketRouter.use('/ticket', bodyParser.json());
 
-async function getOpenTickects(req, res) {
-    try {
-        const tickets = await getAllTicketsOpenTicket();
-        res.send(tickets);
-    } catch (err) {
-        res.sendStatus(500);
-    }
-}
-ticketRouter.get('/ticket/all/open',
-    getOpenTickects
-);
+ticketRouter.get('/ticket/details/open/all', ticketEventEmitter.allOpenTicketDetailsEvent.bind(ticketEventEmitter));
 
-async function getClosedTickets(req, res) {
-    try {
-        const tickets = await getAllTicketsClosedTicket();
-        res.send(tickets);
-    } catch (err) {
-        res.sendStatus(500);
-    }
-}
-ticketRouter.get('/ticket/all/close',
-    getClosedTickets
-);
+ticketRouter.get('/ticket/details/close/all', ticketEventEmitter.allClosedTicketDetailsEvent.bind(ticketEventEmitter));
 
-ticketRouter.get('/bus',
-    async (req, res) => {
-        const bus = await queryBusById();
-        console.log(bus);
-        res.send(bus);
-    }
-);
+ticketRouter.put('/ticket/open', ticketEventEmitter.openTicketEvent.bind(ticketEventEmitter));
 
-async function bookTicket(req, res) {
-    try {
-        const dataValidation = validationResult(req);
-        if (dataValidation.isEmpty()) {
-            const reqBody = req.body;
-            const ticket = await closeTicket(reqBody.phone_number, reqBody.seat_number);
-            if (ticket) {
-                res.send(ticket);
-            } else {
-                res.status(409).send({
-                    message: 'ticket unavailable'
-                })
-            }
-        } else {
-            res.sendStatus(400);
-        }
-    } catch (err) {
-        if (err instanceof UserNotFoundException) {
-            res.status(404).send({
-                message: 'Please register before booking ticket'
-            });
-            return;
-        }
-        res.sendStatus(500);
-    }
-}
 ticketRouter.put('/ticket/close',
     body(['phone_number'])
         .isLength({
@@ -76,70 +22,11 @@ ticketRouter.put('/ticket/close',
             locale: 'en-IN'
         }),
     body(['seat_number']).isNumeric(),
-    bookTicket
+    ticketEventEmitter.closeTicketEvent.bind(ticketEventEmitter)
 );
 
+ticketRouter.put('/ticket/admin/open/all', ticketEventEmitter.openAllTicketsEvent.bind(ticketEventEmitter));
 
-async function unBookTicket(req, res) {
-    try {
-        const ticket = await openTicket(req.query.ticketId);
-        res.send(ticket);
-    } catch (err) {
-        if (err instanceof TicketNotFoundException) {
-            res.status(404).send({
-                message: 'ticket not found'
-            });
-            return;
-        }
-        res.sendStatus(500);
-    }
-}
-ticketRouter.get('/ticket/open',
-    unBookTicket
-);
-
-
-async function unBookAllTicket(req, res) {
-    try {
-        await openAllTicket();
-        res.send({
-            message: 'Opened all tickets'
-        })
-    } catch (err) {
-        res.sendStatus(500);
-    }
-}
-ticketRouter.get('/ticket/admin/open/all',
-    unBookAllTicket
-);
-
-async function getBookedUser(req, res) {
-    try {
-        const user = await getUserByTicketId(req.query.ticketId);
-        if (user) {
-            res.send({
-                user: user,
-                message: 'user found'
-            });
-        } else {
-            res.send({
-                user: null,
-                message: 'user found'
-            });
-        }
-
-    } catch (err) {
-        if (err instanceof TicketNotFoundException) {
-            res.status(404).send({
-                message: 'ticket not found'
-            });
-            return;
-        }
-        res.sendStatus(500);
-    }
-}
-ticketRouter.get('/ticket/user',
-    getBookedUser
-);
+ticketRouter.get('/ticket/user', ticketEventEmitter.ticketHolderUserDetailsEvent.bind(ticketEventEmitter));
 
 export { ticketRouter };

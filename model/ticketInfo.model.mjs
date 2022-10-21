@@ -192,4 +192,35 @@ async function persistUserTicket(userId, seatNumber) {
     }
 }
 
-export { persistUserTicket, getTicketBySeatNumber, getTicketById, getAllTicketsByState, initBusTickets, getBusById }
+async function reInitTicket(ticketId) {
+    const bus = await getBusById(null);
+
+    const [mysqlSession, ticketInfoTable] = await getTicketInfoTable();
+
+    mysqlSession.sql('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+
+    await mysqlSession.startTransaction();
+
+    const ticket = await getTicketById(ticketId);
+
+    try {
+        return await ticketInfoTable
+            .update()
+            .where('ticket_id = :ticketId and bus_id = :busId')
+            .bind('ticketId', ticket.ticket_id)
+            .bind('busId', bus.bus_id)
+            .set('user_id', null)
+            .set('is_open', true)
+            .execute()
+            .then(async () => {
+                await mysqlSession.commit();
+            });
+    } catch (err) {
+        await mysqlSession.rollback();
+        throw err;
+    } finally {
+        mysqlSession.close();
+    }
+}
+
+export { persistUserTicket, getTicketBySeatNumber, getTicketById, getAllTicketsByState, initBusTickets, getBusById, reInitTicket }

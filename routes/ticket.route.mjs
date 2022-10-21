@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
 import { body, validationResult } from 'express-validator';
-import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket } from "../service/ticketInfo.service.mjs";
+import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, openTicket } from "../service/ticketInfo.service.mjs";
 import { getBusById } from "../model/ticketInfo.model.mjs";
 import { UserNotFoundException } from "../error/user.error.mjs";
 
@@ -66,7 +66,7 @@ async function bookTicket(req, res) {
         res.sendStatus(500);
     }
 }
-ticketRouter.put('/ticket/book/:seatNumber',
+ticketRouter.put('/ticket/close',
     body(['phone_number'])
         .isLength({
             min: 10, max: 10
@@ -76,6 +76,21 @@ ticketRouter.put('/ticket/book/:seatNumber',
         }),
     body(['seat_number']).isNumeric(),
     bookTicket
+);
+
+
+async function unBookTicket(req, res) {
+    try {
+        const ticket = await openTicket(req.query.ticketId);
+        // console.log(ticket);
+        // res.send(req.query.ticketId)
+        res.send(ticket);
+    } catch (err) {
+        res.sendStatus(500);
+    }
+}
+ticketRouter.get('/ticket/open',
+    unBookTicket
 );
 
 export { ticketRouter };

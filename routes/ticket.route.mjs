@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
 import { body, validationResult } from 'express-validator';
-import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, openTicket } from "../service/ticketInfo.service.mjs";
+import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, openAllTicket, openTicket } from "../service/ticketInfo.service.mjs";
 import { getBusById } from "../model/ticketInfo.model.mjs";
 import { UserNotFoundException } from "../error/user.error.mjs";
 import { TicketNotFoundException } from "../error/ticket.error.mjs";
@@ -96,6 +96,21 @@ async function unBookTicket(req, res) {
 }
 ticketRouter.get('/ticket/open',
     unBookTicket
+);
+
+
+async function unBookAllTicket(req, res) {
+    try {
+        await openAllTicket();
+        res.send({
+            message: 'Opened all tickets'
+        })
+    } catch (err) {
+        res.sendStatus(500);
+    }
+}
+ticketRouter.get('/ticket/admin/open/all',
+    unBookAllTicket
 );
 
 export { ticketRouter };

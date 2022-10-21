@@ -72,7 +72,7 @@
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "http://ec2-3-90-56-110.compute-1.amazonaws.com:7000/api/v1/ticket/open?ticketId=db2f7fe4-3533-4518-ace5-ac184c7c3987",
+					"raw": "http://ec2-3-90-56-110.compute-1.amazonaws.com:7000/api/v1/ticket/open?ticketId=e7fe487c-3baa-40ba-b35f-cf66ba614e1e",
 					"protocol": "http",
 					"host": [
 						"ec2-3-90-56-110",
@@ -90,7 +90,7 @@
 					"query": [
 						{
 							"key": "ticketId",
-							"value": "db2f7fe4-3533-4518-ace5-ac184c7c3987"
+							"value": "e7fe487c-3baa-40ba-b35f-cf66ba614e1e"
 						}
 					]
 				}
@@ -161,10 +161,13 @@
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:7000/api/v1/ticket/admin/open/all",
+					"raw": "http://ec2-3-90-56-110.compute-1.amazonaws.com:7000/api/v1/ticket/admin/open/all",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"ec2-3-90-56-110",
+						"compute-1",
+						"amazonaws",
+						"com"
 					],
 					"port": "7000",
 					"path": [
@@ -208,27 +211,6 @@
 						"v1",
 						"user",
 						"add"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "bus-id",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:7000/api/v1/bus",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "7000",
-					"path": [
-						"api",
-						"v1",
-						"bus"
 					]
 				}
 			},

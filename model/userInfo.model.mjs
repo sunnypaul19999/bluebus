@@ -72,10 +72,10 @@ async function queryUserById(userId) {
             const result = res.fetchOne();
             if (result) {
                 return {
-                    user_id: row[0],
-                    given_name: row[1],
-                    family_name: row[2],
-                    phone_number: row[3]
+                    user_id: result[0],
+                    given_name: result[1],
+                    family_name: result[2],
+                    phone_number: result[3]
                 };
             } else {
                 return null;

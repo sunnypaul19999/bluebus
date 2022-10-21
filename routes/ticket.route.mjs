@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
 import { body, validationResult } from 'express-validator';
-import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, openAllTicket, openTicket } from "../service/ticketInfo.service.mjs";
+import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, getTicket, getUserByTicketId, openAllTicket, openTicket } from "../service/ticketInfo.service.mjs";
 import { getBusById } from "../model/ticketInfo.model.mjs";
 import { UserNotFoundException } from "../error/user.error.mjs";
 import { TicketNotFoundException } from "../error/ticket.error.mjs";
@@ -111,6 +111,35 @@ async function unBookAllTicket(req, res) {
 }
 ticketRouter.get('/ticket/admin/open/all',
     unBookAllTicket
+);
+
+async function getBookedUser(req, res) {
+    try {
+        const user = await getUserByTicketId(req.query.ticketId);
+        if (user) {
+            res.send({
+                user: user,
+                message: 'user found'
+            });
+        } else {
+            res.send({
+                user: null,
+                message: 'user found'
+            });
+        }
+
+    } catch (err) {
+        if (err instanceof TicketNotFoundException) {
+            res.status(404).send({
+                message: 'ticket not found'
+            });
+            return;
+        }
+        res.sendStatus(500);
+    }
+}
+ticketRouter.get('/ticket/user',
+    getBookedUser
 );
 
 export { ticketRouter };

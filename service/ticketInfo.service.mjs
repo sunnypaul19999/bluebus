@@ -1,6 +1,7 @@
+import { TicketNotFoundException } from '../error/ticket.error.mjs';
 import { UserNotFoundException } from '../error/user.error.mjs';
 import { persistUserTicket, getTicketBySeatNumber, getTicketById, getAllTicketsByState, initBusTickets, getBusById, reInitTicket, reInitAllTicket } from '../model/ticketInfo.model.mjs';
-import { queryUserByPhoneNumber } from '../model/userInfo.model.mjs';
+import { queryUserById, queryUserByPhoneNumber } from '../model/userInfo.model.mjs';
 
 async function getAllTicketsOpenTicket() {
     try {
@@ -52,4 +53,29 @@ async function openAllTicket() {
     }
 }
 
-export { getAllTicketsOpenTicket, getAllTicketsClosedTicket, closeTicket, openTicket, openAllTicket };
+async function getTicket(ticketId) {
+    try {
+        const ticket = await getTicketById(ticketId);
+        if (ticket) {
+            return ticket;
+        } else {
+            throw new TicketNotFoundException('ticket not found');
+        }
+    } catch (err) {
+        console.error(err, 'Failed to get ticket by ticket id from persisten storage');
+        throw err;
+    }
+}
+
+async function getUserByTicketId(ticketId) {
+    try {
+        const ticket = await getTicket(ticketId);
+        const user = await queryUserById(ticket.user_id);
+        return user;
+    } catch (err) {
+        console.error(err, 'Failed to get user by ticket id from persisten storage');
+        throw err;
+    }
+}
+
+export { getAllTicketsOpenTicket, getAllTicketsClosedTicket, closeTicket, openTicket, openAllTicket, getTicket, getUserByTicketId };

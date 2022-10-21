@@ -186,6 +186,7 @@ async function persistUserTicket(userId, seatNumber) {
                 .execute()
                 .then(async () => {
                     await mysqlSession.commit();
+                    return await getTicketBySeatNumber(seatNumber);
                 });
         } else {
             return null;

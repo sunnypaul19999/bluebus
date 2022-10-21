@@ -85,13 +85,16 @@ async function queryUserById(userId) {
         });
 }
 
-/*
-    userDTO = {
+
+/**
+ * 
+ * @param  userDTO {
         given_name: string,
         family_name: string,
         phone_number: int
     }
-*/
+ * @returns 
+ */
 async function persistUserIfNotExists(userDTO) {
     const [mysqlSession, userTable] = await getUserTable();
 

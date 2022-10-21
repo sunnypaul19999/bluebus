@@ -2,22 +2,22 @@ import { mysqlConfig, mysqlClient } from '../config/database.config.mjs';
 import { v4 as uuidV4 } from 'uuid';
 import { TicketNotFoundException } from '../error/ticket.error.mjs';
 
-async function getBusInfoTable() {
+async function queryBusInfoTable() {
     const mysqlSession = await mysqlClient.getSession();
     const schema = mysqlSession.getSchema(mysqlConfig.schema.name);
     const table = schema.getTable(mysqlConfig.schema.table.bus_info)
     return [mysqlSession, table];
 }
 
-async function getTicketInfoTable() {
+async function queryTicketInfoTable() {
     const mysqlSession = await mysqlClient.getSession();
     const schema = mysqlSession.getSchema(mysqlConfig.schema.name);
     const table = schema.getTable(mysqlConfig.schema.table.ticket_info)
     return [mysqlSession, table];
 }
 
-async function getBusById() {
-    const [mysqlSession, busInfoTable] = await getBusInfoTable();
+async function queryBusById() {
+    const [mysqlSession, busInfoTable] = await queryBusInfoTable();
 
     return await busInfoTable
         .select('bus_id', 'bus_tickets')
@@ -35,10 +35,10 @@ async function getBusById() {
 }
 
 async function initBusTickets() {
-    const bus = await getBusById();
+    const bus = await queryBusById();
     const maxTickets = bus.max_tickets;
 
-    const [mysqlSession, ticketInfoTable] = await getTicketInfoTable();
+    const [mysqlSession, ticketInfoTable] = await queryTicketInfoTable();
 
     await mysqlSession.startTransaction();
 
@@ -72,10 +72,10 @@ async function initBusTickets() {
  * 
  * @param state boolean
  */
-async function getAllTicketsByState(state) {
-    const bus = await getBusById(null);
+async function queryAllTicketsByState(state) {
+    const bus = await queryBusById(null);
 
-    const [mysqlSession, ticketInfoTable] = await getTicketInfoTable();
+    const [mysqlSession, ticketInfoTable] = await queryTicketInfoTable();
 
     return await ticketInfoTable
         .select('ticket_id', 'bus_id', 'user_id', 'seat_number', 'is_open')
@@ -111,8 +111,8 @@ async function getAllTicketsByState(state) {
         });
 }
 
-async function getTicketById(ticketId) {
-    const [mysqlSession, ticketInfoTable] = await getTicketInfoTable();
+async function queryTicketById(ticketId) {
+    const [mysqlSession, ticketInfoTable] = await queryTicketInfoTable();
 
     return await ticketInfoTable
         .select('ticket_id', 'bus_id', 'user_id', 'seat_number', 'is_open')
@@ -138,10 +138,10 @@ async function getTicketById(ticketId) {
         });
 }
 
-async function getTicketBySeatNumber(seatNumber) {
-    const bus = await getBusById(null);
+async function queryTicketBySeatNumber(seatNumber) {
+    const bus = await queryBusById(null);
 
-    const [mysqlSession, ticketInfoTable] = await getTicketInfoTable();
+    const [mysqlSession, ticketInfoTable] = await queryTicketInfoTable();
 
     return await ticketInfoTable
         .select('ticket_id', 'bus_id', 'user_id', 'seat_number', 'is_open')
@@ -164,15 +164,15 @@ async function getTicketBySeatNumber(seatNumber) {
 }
 
 async function persistUserTicket(userId, seatNumber) {
-    const bus = await getBusById(null);
+    const bus = await queryBusById(null);
 
-    const [mysqlSession, ticketInfoTable] = await getTicketInfoTable();
+    const [mysqlSession, ticketInfoTable] = await queryTicketInfoTable();
 
     mysqlSession.sql('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
 
     await mysqlSession.startTransaction();
 
-    const ticket = await getTicketBySeatNumber(seatNumber);
+    const ticket = await queryTicketBySeatNumber(seatNumber);
 
     try {
         if (ticket.is_open) {
@@ -186,7 +186,7 @@ async function persistUserTicket(userId, seatNumber) {
                 .execute()
                 .then(async () => {
                     await mysqlSession.commit();
-                    return await getTicketBySeatNumber(seatNumber);
+                    return await queryTicketBySeatNumber(seatNumber);
                 });
         } else {
             return null;
@@ -200,15 +200,15 @@ async function persistUserTicket(userId, seatNumber) {
 }
 
 async function reInitTicket(ticketId) {
-    const bus = await getBusById(null);
+    const bus = await queryBusById(null);
 
-    const [mysqlSession, ticketInfoTable] = await getTicketInfoTable();
+    const [mysqlSession, ticketInfoTable] = await queryTicketInfoTable();
 
     mysqlSession.sql('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
 
     await mysqlSession.startTransaction();
 
-    const ticket = await getTicketById(ticketId);
+    const ticket = await queryTicketById(ticketId);
 
     try {
         if (ticket) {
@@ -235,9 +235,9 @@ async function reInitTicket(ticketId) {
 }
 
 async function reInitAllTicket() {
-    const bus = await getBusById(null);
+    const bus = await queryBusById(null);
 
-    const [mysqlSession, ticketInfoTable] = await getTicketInfoTable();
+    const [mysqlSession, ticketInfoTable] = await queryTicketInfoTable();
 
     mysqlSession.sql('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
 
@@ -262,4 +262,4 @@ async function reInitAllTicket() {
     }
 }
 
-export { persistUserTicket, getTicketBySeatNumber, getTicketById, getAllTicketsByState, initBusTickets, getBusById, reInitTicket, reInitAllTicket }
+export { persistUserTicket, queryTicketBySeatNumber, queryTicketById, queryAllTicketsByState, queryBusById, initBusTickets, reInitTicket, reInitAllTicket }

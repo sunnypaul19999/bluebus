@@ -1,11 +1,11 @@
 import { TicketNotFoundException } from '../error/ticket.error.mjs';
 import { UserNotFoundException } from '../error/user.error.mjs';
-import { persistUserTicket, getTicketBySeatNumber, getTicketById, getAllTicketsByState, initBusTickets, getBusById, reInitTicket, reInitAllTicket } from '../model/ticketInfo.model.mjs';
+import { persistUserTicket, queryTicketBySeatNumber, queryTicketById, queryAllTicketsByState, queryBusById, initBusTickets, reInitTicket, reInitAllTicket } from '../model/ticketInfo.model.mjs';
 import { queryUserById, queryUserByPhoneNumber } from '../model/userInfo.model.mjs';
 
 async function getAllTicketsOpenTicket() {
     try {
-        return await getAllTicketsByState(true);
+        return await queryAllTicketsByState(true);
     } catch (err) {
         console.error(err, 'Failed to load ticket state from persistent storage');
         throw new Error('Failed to load ticket state from persistent storage');
@@ -14,7 +14,7 @@ async function getAllTicketsOpenTicket() {
 
 async function getAllTicketsClosedTicket(phoneNumber) {
     try {
-        return await getAllTicketsByState(false);
+        return await queryAllTicketsByState(false);
     } catch (err) {
         console.error(err, 'Failed to load ticket state from persistent storage');
         throw new Error('Failed to load ticket state from persistent storage');
@@ -53,9 +53,9 @@ async function openAllTicket() {
     }
 }
 
-async function getTicket(ticketId) {
+async function getTicketById(ticketId) {
     try {
-        const ticket = await getTicketById(ticketId);
+        const ticket = await queryTicketById(ticketId);
         if (ticket) {
             return ticket;
         } else {
@@ -69,7 +69,7 @@ async function getTicket(ticketId) {
 
 async function getUserByTicketId(ticketId) {
     try {
-        const ticket = await getTicket(ticketId);
+        const ticket = await getTicketById(ticketId);
         const user = await queryUserById(ticket.user_id);
         return user;
     } catch (err) {
@@ -78,4 +78,4 @@ async function getUserByTicketId(ticketId) {
     }
 }
 
-export { getAllTicketsOpenTicket, getAllTicketsClosedTicket, closeTicket, openTicket, openAllTicket, getTicket, getUserByTicketId };
+export { getAllTicketsOpenTicket, getAllTicketsClosedTicket, closeTicket, openTicket, openAllTicket, getTicketById, getUserByTicketId };

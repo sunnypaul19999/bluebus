@@ -157,7 +157,7 @@ async function getTicketBySeatNumber(seatNumber) {
         });
 }
 
-async function fillTicket(userId, seatNumber) {
+async function persistUserTicket(userId, seatNumber) {
     const bus = await getBusById(null);
 
     const [mysqlSession, ticketInfoTable] = await getTicketInfoTable();
@@ -171,22 +171,25 @@ async function fillTicket(userId, seatNumber) {
     try {
         if (ticket.is_open) {
             return await ticketInfoTable
-                .update('user_id', 'is_open')
+                .update()
                 .where('ticket_id = :ticketId and bus_id = :busId')
-                .bind('ticket_id', ticket.ticket_id)
-                .bind('bus_id', bus.bus_id)
-                .set(userId, false)
+                .bind('ticketId', ticket.ticket_id)
+                .bind('busId', bus.bus_id)
+                .set('user_id', userId)
+                .set('is_open', false)
                 .execute()
                 .then(async () => {
-                    await session.commit();
-                }).finally(() => {
-                    mysqlSession.close();
+                    await mysqlSession.commit();
                 });
+        } else {
+            return null;
         }
     } catch (err) {
         await mysqlSession.rollback();
         throw err;
+    } finally {
+        mysqlSession.close();
     }
 }
 
-export { fillTicket, getTicketBySeatNumber, getTicketById, getAllTicketsByState, initBusTickets, getBusById }
+export { persistUserTicket, getTicketBySeatNumber, getTicketById, getAllTicketsByState, initBusTickets, getBusById }

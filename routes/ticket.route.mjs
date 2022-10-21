@@ -1,8 +1,9 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
 import { body, validationResult } from 'express-validator';
-import { getAllTicketsClosedTicket, getAllTicketsOpenTicket } from "../service/ticketInfo.service.mjs";
+import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket } from "../service/ticketInfo.service.mjs";
 import { getBusById } from "../model/ticketInfo.model.mjs";
+import { UserNotFoundException } from "../error/user.error.mjs";
 
 const ticketRouter = Router();
 ticketRouter.use('/ticket', bodyParser.json());
@@ -37,6 +38,44 @@ ticketRouter.get('/bus',
         console.log(bus);
         res.send(bus);
     }
+);
+
+async function bookTicket(req, res) {
+    try {
+        const dataValidation = validationResult(req);
+        if (dataValidation.isEmpty()) {
+            const reqBody = req.body;
+            const ticket = await closeTicket(reqBody.phone_number, reqBody.seat_number);
+            if (ticket) {
+                res.send(ticket);
+            } else {
+                res.status(409).send({
+                    message: 'ticket unavailable'
+                })
+            }
+        } else {
+            res.sendStatus(400);
+        }
+    } catch (err) {
+        if (err instanceof UserNotFoundException) {
+            res.status(404).send({
+                message: 'Please register before booking ticket'
+            });
+            return;
+        }
+        res.sendStatus(500);
+    }
+}
+ticketRouter.put('/ticket/book/:seatNumber',
+    body(['phone_number'])
+        .isLength({
+            min: 10, max: 10
+        })
+        .isNumeric({
+            locale: 'en-IN'
+        }),
+    body(['seat_number']).isNumeric(),
+    bookTicket
 );
 
 export { ticketRouter };

@@ -91,7 +91,9 @@ async function queryAllTicketsByState(state) {
                     return {
                         ticket_id: row[0],
                         bus_id: row[1],
-                        is_open: row[3]
+                        // user_id: row[2],
+                        seat_number: row[3],
+                        is_open: row[4]
                     };
                 });
             } else {
@@ -99,8 +101,9 @@ async function queryAllTicketsByState(state) {
                     return {
                         ticket_id: row[0],
                         bus_id: row[1],
-                        user_id: row[2],
-                        is_open: row[3]
+                        // user_id: row[2],
+                        seat_number: row[3],
+                        is_open: row[4]
                     };
                 });
             }

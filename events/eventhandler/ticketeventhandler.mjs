@@ -2,6 +2,7 @@ import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, getUse
 import { validationResult } from 'express-validator';
 import { ticketEventEmitter } from "../event/ticket.event.mjs";
 import { TicketNotFoundException } from '../../error/ticket.error.mjs';
+import { UserNotFoundException } from '../../error/user.error.mjs';
 
 
 async function openTicketEventHandler(req, res) {

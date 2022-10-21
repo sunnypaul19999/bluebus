@@ -19,11 +19,12 @@ CREATE TABLE IF NOT EXISTS bus_info (
     CONSTRAINT bus_info_pk_bus_id PRIMARY KEY (bus_id)
 );
 
+drop table if exists ticket_info;
 CREATE TABLE IF NOT EXISTS ticket_info (
-    ticket_id INTEGER,
-    seat_number INTEGER auto_increment,
-    isOpen BOOLEAN DEFAULT FALSE,
-    timestamp TIMESTAMP,
+    ticket_id varchar(250),
+    seat_number INTEGER,
+    is_open BOOLEAN DEFAULT FALSE,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP (),
     bus_id VARCHAR(250),
     user_id VARCHAR(250),
     CONSTRAINT ticket_info_pk_ticket_id PRIMARY KEY (ticket_id),
@@ -32,3 +33,5 @@ CREATE TABLE IF NOT EXISTS ticket_info (
     CONSTRAINT ticket_info_fk_user_id FOREIGN KEY (user_id)
         REFERENCES user_info (user_id)
 );
+
+insert into bus_info (bus_id, bus_tickets) values('bluebus1', 40); 

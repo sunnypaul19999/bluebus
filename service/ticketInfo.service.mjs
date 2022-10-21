@@ -39,7 +39,7 @@ async function openTicket(ticketId) {
         return await reInitTicket(ticketId);
     } catch (err) {
         console.error(err, 'Failed to load ticket state from persistent storage');
-        throw new Error('Failed to load ticket state from persistent storage');
+        throw err;
     }
 }
 

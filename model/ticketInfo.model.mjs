@@ -1,5 +1,6 @@
 import { mysqlConfig, mysqlClient } from '../config/database.config.mjs';
 import { v4 as uuidV4 } from 'uuid';
+import { TicketNotFoundException } from '../error/ticket.error.mjs';
 
 async function getBusInfoTable() {
     const mysqlSession = await mysqlClient.getSession();
@@ -120,13 +121,18 @@ async function getTicketById(ticketId) {
         .execute()
         .then(res => {
             const result = res.fetchOne();
-            return {
-                ticket_id: result[0],
-                bus_id: result[1],
-                user_id: result[2],
-                seat_number: result[3],
-                is_open: result[4]
+            if (result) {
+                return {
+                    ticket_id: result[0],
+                    bus_id: result[1],
+                    user_id: result[2],
+                    seat_number: result[3],
+                    is_open: result[4]
+                }
+            } else {
+                return null;
             }
+
         }).finally(() => {
             mysqlSession.close();
         });
@@ -204,17 +210,21 @@ async function reInitTicket(ticketId) {
     const ticket = await getTicketById(ticketId);
 
     try {
-        return await ticketInfoTable
-            .update()
-            .where('ticket_id = :ticketId and bus_id = :busId')
-            .bind('ticketId', ticket.ticket_id)
-            .bind('busId', bus.bus_id)
-            .set('user_id', null)
-            .set('is_open', true)
-            .execute()
-            .then(async () => {
-                await mysqlSession.commit();
-            });
+        if (ticket) {
+            return await ticketInfoTable
+                .update()
+                .where('ticket_id = :ticketId and bus_id = :busId')
+                .bind('ticketId', ticket.ticket_id)
+                .bind('busId', bus.bus_id)
+                .set('user_id', null)
+                .set('is_open', true)
+                .execute()
+                .then(async () => {
+                    await mysqlSession.commit();
+                });
+        } else {
+            throw new TicketNotFoundException('cannot close ticket. ticket not found');
+        }
     } catch (err) {
         await mysqlSession.rollback();
         throw err;

@@ -4,6 +4,7 @@ import { body, validationResult } from 'express-validator';
 import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, openTicket } from "../service/ticketInfo.service.mjs";
 import { getBusById } from "../model/ticketInfo.model.mjs";
 import { UserNotFoundException } from "../error/user.error.mjs";
+import { TicketNotFoundException } from "../error/ticket.error.mjs";
 
 const ticketRouter = Router();
 ticketRouter.use('/ticket', bodyParser.json());
@@ -82,10 +83,14 @@ ticketRouter.put('/ticket/close',
 async function unBookTicket(req, res) {
     try {
         const ticket = await openTicket(req.query.ticketId);
-        // console.log(ticket);
-        // res.send(req.query.ticketId)
         res.send(ticket);
     } catch (err) {
+        if (err instanceof TicketNotFoundException) {
+            res.status(404).send({
+                message: 'ticket not found'
+            });
+            return;
+        }
         res.sendStatus(500);
     }
 }

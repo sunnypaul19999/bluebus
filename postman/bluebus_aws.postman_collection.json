@@ -1,0 +1,238 @@
+{
+	"info": {
+		"_postman_id": "62f49271-988c-43cd-87a1-8943549283c9",
+		"name": "bluebus_aws",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "close-ticket",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"seat_number\": 37,\r\n    \"phone_number\": \"8459696752\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://ec2-3-90-56-110.compute-1.amazonaws.com:7000/api/v1/ticket/close",
+					"protocol": "http",
+					"host": [
+						"ec2-3-90-56-110",
+						"compute-1",
+						"amazonaws",
+						"com"
+					],
+					"port": "7000",
+					"path": [
+						"api",
+						"v1",
+						"ticket",
+						"close"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all-closed-ticket-details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://ec2-3-90-56-110.compute-1.amazonaws.com:7000/api/v1/ticket/details/close/all",
+					"protocol": "http",
+					"host": [
+						"ec2-3-90-56-110",
+						"compute-1",
+						"amazonaws",
+						"com"
+					],
+					"port": "7000",
+					"path": [
+						"api",
+						"v1",
+						"ticket",
+						"details",
+						"close",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "open-ticket",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://ec2-3-90-56-110.compute-1.amazonaws.com:7000/api/v1/ticket/open?ticketId=db2f7fe4-3533-4518-ace5-ac184c7c3987",
+					"protocol": "http",
+					"host": [
+						"ec2-3-90-56-110",
+						"compute-1",
+						"amazonaws",
+						"com"
+					],
+					"port": "7000",
+					"path": [
+						"api",
+						"v1",
+						"ticket",
+						"open"
+					],
+					"query": [
+						{
+							"key": "ticketId",
+							"value": "db2f7fe4-3533-4518-ace5-ac184c7c3987"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all-open-ticket-details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://ec2-3-90-56-110.compute-1.amazonaws.com:7000/api/v1/ticket/details/open/all",
+					"protocol": "http",
+					"host": [
+						"ec2-3-90-56-110",
+						"compute-1",
+						"amazonaws",
+						"com"
+					],
+					"port": "7000",
+					"path": [
+						"api",
+						"v1",
+						"ticket",
+						"details",
+						"open",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ticket-user-holder-details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://ec2-3-90-56-110.compute-1.amazonaws.com:7000/api/v1/ticket/user?ticketId=502b95bd-6790-4634-9bae-3e7546cd1d82",
+					"protocol": "http",
+					"host": [
+						"ec2-3-90-56-110",
+						"compute-1",
+						"amazonaws",
+						"com"
+					],
+					"port": "7000",
+					"path": [
+						"api",
+						"v1",
+						"ticket",
+						"user"
+					],
+					"query": [
+						{
+							"key": "ticketId",
+							"value": "502b95bd-6790-4634-9bae-3e7546cd1d82"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all-tickets-open",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:7000/api/v1/ticket/admin/open/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7000",
+					"path": [
+						"api",
+						"v1",
+						"ticket",
+						"admin",
+						"open",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create-user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"phone_number\": \"8459696752\",\r\n    \"given_name\": \"test1\",\r\n    \"family_name\": \"user\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://ec2-3-90-56-110.compute-1.amazonaws.com:7000/api/v1/user/add",
+					"protocol": "http",
+					"host": [
+						"ec2-3-90-56-110",
+						"compute-1",
+						"amazonaws",
+						"com"
+					],
+					"port": "7000",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bus-id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:7000/api/v1/bus",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7000",
+					"path": [
+						"api",
+						"v1",
+						"bus"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

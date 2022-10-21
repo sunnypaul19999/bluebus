@@ -102,7 +102,7 @@ async function persistUserIfNotExists(userDTO) {
             .insert("user_id", "given_name", "family_name", "phone_number")
             .values(uuidV4(), userDTO.given_name, userDTO.family_name, userDTO.phone_number)
             .execute()
-            .then(async () => await queryUserByPhoneNumber(userEmail))
+            .then(async () => await queryUserByPhoneNumber(userDTO.phone_number))
             .finally(() => {
                 mysqlSession.close();
             });

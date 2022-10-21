@@ -19,15 +19,23 @@ async function userAdd(req, res) {
             res.sendStatus(500);
         }
     } else {
-        res.sendStatus(405);
+        res.sendStatus(400);
     }
 }
 userRouter.post('/user/add',
     // body(['given_name', 'family_name', 'phone_number']).notEmpty,
-    // body(['given_name', 'family_name']).isLength({
-    //     min: 3, max: 3
-    // }),
-    // body(['phone_number']).isMobilePhone(),
+    body(['given_name', 'family_name'])
+        .isLength({
+            min: 3, max: 50
+        })
+        .toUpperCase(),
+    body(['phone_number'])
+        .isLength({
+            min: 10, max: 10
+        })
+        .isNumeric({
+            locale: 'en-IN'
+        }),
     userAdd
 );
 

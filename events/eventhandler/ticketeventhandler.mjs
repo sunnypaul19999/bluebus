@@ -12,7 +12,7 @@ async function openTicketEventHandler(req, res) {
     } catch (err) {
         if (err instanceof TicketNotFoundException) {
             res.status(404).send({
-                message: 'ticket not found'
+                message: 'Ticket not found'
             });
             return;
         }
@@ -43,7 +43,7 @@ async function closeTicketEventHandler(req, res) {
                 res.send(ticket);
             } else {
                 res.status(409).send({
-                    message: 'ticket unavailable'
+                    message: 'Ticket unavailable'
                 })
             }
         } else {
@@ -67,19 +67,19 @@ async function ticketHolderDetailsEventHandler(req, res) {
         if (user) {
             res.send({
                 user: user,
-                message: 'user found'
+                message: 'Ticket user found'
             });
         } else {
             res.send({
                 user: null,
-                message: 'user found'
+                message: 'No user found'
             });
         }
 
     } catch (err) {
         if (err instanceof TicketNotFoundException) {
             res.status(404).send({
-                message: 'ticket not found'
+                message: 'Ticket not found'
             });
             return;
         }

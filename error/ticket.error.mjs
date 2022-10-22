@@ -4,4 +4,10 @@ class TicketNotFoundException extends Error {
     }
 }
 
-export { TicketNotFoundException };
+class InvalidSeatNumberException extends Error {
+    constructor(message) {
+        super(message);
+    }
+}
+
+export { TicketNotFoundException, InvalidSeatNumberException };

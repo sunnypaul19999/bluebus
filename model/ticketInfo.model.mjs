@@ -1,6 +1,6 @@
 import { mysqlConfig, mysqlClient } from '../config/database.config.mjs';
 import { v4 as uuidV4 } from 'uuid';
-import { TicketNotFoundException } from '../error/ticket.error.mjs';
+import { InvalidSeatNumberException, TicketNotFoundException } from '../error/ticket.error.mjs';
 
 async function queryBusInfoTable() {
     const mysqlSession = await mysqlClient.getSession();
@@ -154,12 +154,16 @@ async function queryTicketBySeatNumber(seatNumber) {
         .execute()
         .then(res => {
             const result = res.fetchOne();
-            return {
-                ticket_id: result[0],
-                bus_id: result[1],
-                user_id: result[2],
-                seat_number: result[3],
-                is_open: result[4]
+            if (result) {
+                return {
+                    ticket_id: result[0],
+                    bus_id: result[1],
+                    user_id: result[2],
+                    seat_number: result[3],
+                    is_open: result[4]
+                }
+            } else {
+                return null;
             }
         }).finally(() => {
             mysqlSession.close();
@@ -178,21 +182,25 @@ async function persistUserTicket(userId, seatNumber) {
     const ticket = await queryTicketBySeatNumber(seatNumber);
 
     try {
-        if (ticket.is_open) {
-            return await ticketInfoTable
-                .update()
-                .where('ticket_id = :ticketId and bus_id = :busId')
-                .bind('ticketId', ticket.ticket_id)
-                .bind('busId', bus.bus_id)
-                .set('user_id', userId)
-                .set('is_open', false)
-                .execute()
-                .then(async () => {
-                    await mysqlSession.commit();
-                    return await queryTicketBySeatNumber(seatNumber);
-                });
+        if (ticket) {
+            if (ticket.is_open) {
+                return await ticketInfoTable
+                    .update()
+                    .where('ticket_id = :ticketId and bus_id = :busId')
+                    .bind('ticketId', ticket.ticket_id)
+                    .bind('busId', bus.bus_id)
+                    .set('user_id', userId)
+                    .set('is_open', false)
+                    .execute()
+                    .then(async () => {
+                        await mysqlSession.commit();
+                        return await queryTicketBySeatNumber(seatNumber);
+                    });
+            } else {
+                return null;
+            }
         } else {
-            return null;
+            throw new InvalidSeatNumberException(`Invalid seat number: ${seatNumber}`);
         }
     } catch (err) {
         await mysqlSession.rollback();

@@ -1,7 +1,7 @@
 import { closeTicket, getAllTicketsClosedTicket, getAllTicketsOpenTicket, getUserByTicketId, openAllTicket, openTicket } from '../../service/ticketInfo.service.mjs';
 import { validationResult } from 'express-validator';
 import { ticketEventEmitter } from "../event/ticket.event.mjs";
-import { TicketNotFoundException } from '../../error/ticket.error.mjs';
+import { InvalidSeatNumberException, TicketNotFoundException } from '../../error/ticket.error.mjs';
 import { UserNotFoundException } from '../../error/user.error.mjs';
 
 
@@ -51,12 +51,18 @@ async function closeTicketEventHandler(req, res) {
         }
     } catch (err) {
         if (err instanceof UserNotFoundException) {
-            res.status(404).send({
-                message: 'Please register before booking ticket'
-            });
-            return;
+            res.status(404)
+                .send({
+                    message: 'Please register before booking ticket'
+                });
+        } else if (err instanceof InvalidSeatNumberException) {
+            res.status(404)
+                .send({
+                    message: 'Invalid seat number'
+                });
+        } else {
+            res.sendStatus(500);
         }
-        res.sendStatus(500);
     }
 }
 ticketEventEmitter.on('closeticket', closeTicketEventHandler);

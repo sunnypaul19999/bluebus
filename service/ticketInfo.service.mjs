@@ -1,4 +1,4 @@
-import { TicketNotFoundException } from '../error/ticket.error.mjs';
+import { InvalidSeatNumberException, TicketNotFoundException } from '../error/ticket.error.mjs';
 import { UserNotFoundException } from '../error/user.error.mjs';
 import { persistUserTicket, queryTicketBySeatNumber, queryTicketById, queryAllTicketsByState, queryBusById, initBusTickets, reInitTicket, reInitAllTicket } from '../model/ticketInfo.model.mjs';
 import { queryUserById, queryUserByPhoneNumber } from '../model/userInfo.model.mjs';
@@ -30,8 +30,8 @@ async function closeTicket(phoneNumber, seatNumber) {
     try {
         return await persistUserTicket(user.user_id, seatNumber);
     } catch (err) {
-        console.error(err, 'Failed to load ticket state from persistent storage');
-        throw new Error('Failed to load ticket state from persistent storage');
+        console.error(err, 'Failed to persist user with ticket');
+        throw err;
     }
 }
 
